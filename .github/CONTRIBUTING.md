@@ -20,15 +20,13 @@ We recommend using Zed for development as it supports C++ out of the box. On som
 
 ```json
 {
-    "lsp": {
-        "clangd": {
-            "binary": {
-                "arguments": [
-                    "--query-driver=C:\\tools\\msys64\\ucrt64\\bin\\*"
-                ]
-            }
-        }
+  "lsp": {
+    "clangd": {
+      "binary": {
+        "arguments": ["--query-driver=C:\\tools\\msys64\\ucrt64\\bin\\*"]
+      }
     }
+  }
 }
 ```
 
@@ -47,6 +45,8 @@ brew install llvm cmake ninja
 ```
 
 While LLVM's compiler should not be used on macos, the included formatter and linter are.
+
+This project uses `qt@6.11.3` and it is recommended to install via the Qt online installer under version 6.11.3. If you run `brew install qt@6`, it will install version 6.12 which has broken changes. Also ensure to add the `Charts` component if you install via the Qt online installer.
 
 ### Windows
 

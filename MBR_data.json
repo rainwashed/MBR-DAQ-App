@@ -1,11 +1,69 @@
 {
   "fields": [
-    { "key": "T",  "name": "Timestamp",   "required": true,  "plot": false },
-    { "key": "E",  "name": "Engine RPM",  "required": false, "plot": true, "unit": "RPM",  "group": "rpm" },
-    { "key": "W",  "name": "Wheel RPM",   "required": false, "plot": true, "unit": "RPM",  "group": "rpm" },
-    { "key": "FR", "name": "Front Right", "required": false, "plot": true, "unit": "mm",   "group": "shock" },
-    { "key": "FL", "name": "Front Left", "required": false, "plot": true, "unit": "mm",   "group": "shock" },
-    { "key": "RR", "name": "Back Right", "required": false, "plot": true, "unit": "mm",   "group": "shock" },
-    { "key": "RL", "name": "Back Left", "required": false, "plot": true, "unit": "mm",   "group": "shock" }
+    { "key": "T", "name": "Timestamp", "required": true, "plot": false },
+    {
+      "key": "E",
+      "name": "Engine RPM",
+      "required": false,
+      "plot": true,
+      "unit": "RPM",
+      "group": "rpm"
+    },
+    {
+      "key": "W",
+      "name": "Wheel RPM",
+      "required": false,
+      "plot": true,
+      "unit": "RPM",
+      "group": "rpm"
+    },
+    {
+      "key": "FR",
+      "name": "Front Right",
+      "required": false,
+      "plot": true,
+      "unit": "mm",
+      "group": "shock"
+    },
+    {
+      "key": "FL",
+      "name": "Front Left",
+      "required": false,
+      "plot": true,
+      "unit": "mm",
+      "group": "shock"
+    },
+    {
+      "key": "RR",
+      "name": "Back Right",
+      "required": false,
+      "plot": true,
+      "unit": "mm",
+      "group": "shock"
+    },
+    {
+      "key": "RL",
+      "name": "Back Left",
+      "required": false,
+      "plot": true,
+      "unit": "mm",
+      "group": "shock"
+    },
+    {
+      "key": "F",
+      "name": "Loadcell Force",
+      "required": false,
+      "plot": true,
+      "unit": "N",
+      "group": "dyno"
+    },
+    {
+      "key": "FD",
+      "name": "Loadcell Force Displacement",
+      "required": false,
+      "plot": true,
+      "unit": "??",
+      "group": "dyno"
+    }
   ]
 }

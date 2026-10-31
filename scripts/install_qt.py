@@ -1,17 +1,24 @@
+# this project uses qt@6.11.3; 6.12 breaks.
 """scripts/install_qt.py — installs Qt6 for local dev."""
+
+import os
 import platform
 import subprocess
-import os
 import sys
 
 if platform.system() == "Darwin":
     subprocess.run(["brew", "install", "qt@6"], check=True)
 elif "MSYSTEM" in os.environ:
     subprocess.run(
-        ["pacman", "-S", "--noconfirm", "--needed",
-         "mingw-w64-ucrt-x86_64-qt6-base",
-         "mingw-w64-ucrt-x86_64-qt6-tools",
-         "mingw-w64-ucrt-x86_64-qt6-charts"],
+        [
+            "pacman",
+            "-S",
+            "--noconfirm",
+            "--needed",
+            "mingw-w64-ucrt-x86_64-qt6-base",
+            "mingw-w64-ucrt-x86_64-qt6-tools",
+            "mingw-w64-ucrt-x86_64-qt6-charts",
+        ],
         check=True,
     )
 else:
