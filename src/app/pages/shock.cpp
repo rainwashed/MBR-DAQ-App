@@ -35,8 +35,8 @@ void shock_page::update() {
         draw_rhs(data.get_time(),
                  data.get_series("FR"),
                  data.get_series("FL"),
-                 data.get_series("RR"),
-                 data.get_series("RL"));
+                 data.get_series("BR"),
+                 data.get_series("BL"));
     }
 }
 

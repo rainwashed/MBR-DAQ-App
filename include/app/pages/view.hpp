@@ -31,6 +31,7 @@ class view_page : public page {
     enum class data_view_t : u8 {
         ALL,
         RPMDATA,
+        DYNODATA,
         SHOCKDATA,
     };
 

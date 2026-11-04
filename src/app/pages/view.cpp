@@ -48,6 +48,7 @@ const char* view_page::data_type_string(data_view_t type) {
     switch (type) {
     case data_view_t::ALL:       return "All Data Shown";
     case data_view_t::RPMDATA:   return "RPM Data Shown";
+    case data_view_t::DYNODATA:  return "Dyno Data Shown";
     case data_view_t::SHOCKDATA: return "Shock Data Shown";
     default:                     return "Unknown";
     }
@@ -315,6 +316,9 @@ void view_page::draw_rhs() {
             if (ImGui::Selectable("RPM", data_show_ == data_view_t::RPMDATA)) {
                 data_show_ = data_view_t::RPMDATA;
             }
+            if (ImGui::Selectable("Dyno", data_show_ == data_view_t::DYNODATA)) {
+                data_show_ = data_view_t::DYNODATA;
+            }
             if (ImGui::Selectable("Shock", data_show_ == data_view_t::SHOCKDATA)) {
                 data_show_ = data_view_t::SHOCKDATA;
             }
@@ -344,6 +348,20 @@ void view_page::draw_rhs() {
                                               data_show_ == data_view_t::RPMDATA,
                                           plot_percent_);
 
+            utils::plot_if_non_empty<f64>("Dyno Force",
+                                          data.get_time(),
+                                          data.get_series("DF"),
+                                          data_show_ == data_view_t::ALL ||
+                                              data_show_ == data_view_t::DYNODATA,
+                                          plot_percent_);
+
+            utils::plot_if_non_empty<f64>("Dyno Displacement",
+                                          data.get_time(),
+                                          data.get_series("DD"),
+                                          data_show_ == data_view_t::ALL ||
+                                              data_show_ == data_view_t::DYNODATA,
+                                          plot_percent_);
+
             utils::plot_if_non_empty<f64>("Front Right Shock Travel",
                                           data.get_time(),
                                           data.get_series("FR"),
@@ -358,13 +376,13 @@ void view_page::draw_rhs() {
                                           plot_percent_);
             utils::plot_if_non_empty<f64>("Rear Right Shock Travel",
                                           data.get_time(),
-                                          data.get_series("RR"),
+                                          data.get_series("BR"),
                                           data_show_ == data_view_t::ALL ||
                                               data_show_ == data_view_t::SHOCKDATA,
                                           plot_percent_);
             utils::plot_if_non_empty<f64>("Rear Left Shock Travel",
                                           data.get_time(),
-                                          data.get_series("RL"),
+                                          data.get_series("BL"),
                                           data_show_ == data_view_t::ALL ||
                                               data_show_ == data_view_t::SHOCKDATA,
                                           plot_percent_);
@@ -696,8 +714,10 @@ void view_page::delete_extra(usize erase_pos) {
         &context_->backend->get_data().get_series("E"),
         &context_->backend->get_data().get_series("FR"),
         &context_->backend->get_data().get_series("FL"),
-        &context_->backend->get_data().get_series("RR"),
-        &context_->backend->get_data().get_series("RL"),
+        &context_->backend->get_data().get_series("BR"),
+        &context_->backend->get_data().get_series("BL"),
+        &context_->backend->get_data().get_series("DF"),
+        &context_->backend->get_data().get_series("DD"),
     };
 
     for (const auto& datum : data) {

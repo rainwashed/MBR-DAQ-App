@@ -19,6 +19,7 @@
 #include "app/assets/images/app_icon.hpp"
 #include "app/assets/texture.hpp"
 #include "app/context.hpp"
+#include "app/pages/dyno.hpp"
 #include "app/pages/home.hpp"
 #include "app/pages/rpm.hpp"
 #include "app/pages/serialmon.hpp"
@@ -174,6 +175,7 @@ void gui_t::change_page(page_type_t type) {
     switch (type) {
     case page_type_t::HOME:   current_page_ = std::make_unique<pages::home_page>(context_); break;
     case page_type_t::RPM:    current_page_ = std::make_unique<pages::rpm_page>(context_); break;
+    case page_type_t::DYNO:   current_page_ = std::make_unique<pages::dyno_page>(context_); break;
     case page_type_t::SHOCK:  current_page_ = std::make_unique<pages::shock_page>(context_); break;
     case page_type_t::VIEW:   current_page_ = std::make_unique<pages::view_page>(context_); break;
     case page_type_t::SERIAL: current_page_ = std::make_unique<pages::serial_page>(context_); break;
@@ -193,6 +195,7 @@ void gui_t::draw_main_menu_bar() {
             MAIN_MENU_BAR_ITEM({
                 if (ImGui::MenuItem("Home")) { change_page(page_type_t::HOME); }
                 if (ImGui::MenuItem("RPM")) { change_page(page_type_t::RPM); }
+                if (ImGui::MenuItem("Dyno")) { change_page(page_type_t::DYNO); }
                 if (ImGui::MenuItem("Shock")) { change_page(page_type_t::SHOCK); }
                 if (ImGui::MenuItem("View")) { change_page(page_type_t::VIEW); }
                 if (ImGui::MenuItem("Serial Monitor")) { change_page(page_type_t::SERIAL); }
