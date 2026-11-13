@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
 #include <gsl/span>
 
@@ -21,7 +20,7 @@ class dyno_page : public page {
     void update() override;
 
   private:
-    void DrawLHS(const std::vector<std::string>& raw_lines);
+    void DrawLHS(const telemetry_data& data);
     void DrawRHS(gsl::span<const double> time,
                  gsl::span<const double> force,
                  gsl::span<const double> displacement);

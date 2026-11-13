@@ -45,6 +45,10 @@ class telemetry_data {
     [[nodiscard]] const stdx::option<local_time>& get_sync_lt() const { return sync_lt_; }
     [[nodiscard]] const std::string&              get_current_line() { return current_line_; }
 
+    // Serializes the stored data as CSV: a header row of configured keys, one row per received
+    // packet. Assumes the caller holds the data latch.
+    [[nodiscard]] std::string to_csv() const;
+
     template <typename Self>
     [[nodiscard]] auto& get_series(this Self&& self, const std::string& key) noexcept {
         auto it = self.series.find(key);

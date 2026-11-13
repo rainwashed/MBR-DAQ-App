@@ -335,6 +335,7 @@ void view_page::draw_rhs() {
         view_page::dynamic_plot_loop();
         if (ImPlot::BeginPlot(plot_title.c_str(), {-1, -1})) {
             const auto cleanup_plot{gsl::finally(ImPlot::EndPlot)};
+            ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_AutoFit, ImPlotAxisFlags_AutoFit);
             utils::plot_if_non_empty<f64>("Wheel Speed",
                                           data.get_time(),
                                           data.get_series("W"),
@@ -727,6 +728,11 @@ void view_page::delete_extra(usize erase_pos) {
     for (const auto& datum : data) {
         datum->erase(datum->begin(), datum->begin() + static_cast<idiff>(erase_pos));
     }
+
+    // Keep the raw packet log aligned with the trimmed series so exports stay consistent.
+    auto& raw_lines = context_->backend->get_data().raw_lines_;
+    raw_lines.erase(raw_lines.begin(),
+                    raw_lines.begin() + static_cast<idiff>(std::min(erase_pos, raw_lines.size())));
 }
 
 void view_page::dynamic_plot_start() {

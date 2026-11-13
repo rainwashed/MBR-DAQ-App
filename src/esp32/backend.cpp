@@ -86,6 +86,7 @@ void telemetry_backend::start() {
 
         if (msg->type == ix::WebSocketMessageType::Message) {
             is_receiving_ = true;
+            log_info(log_, msg->str);
             this->on_message(msg);
             last_data_time_ = std::chrono::steady_clock::now();
         }

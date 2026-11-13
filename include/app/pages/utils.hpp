@@ -15,6 +15,7 @@
 namespace mbr {
 
 struct app_context;
+class telemetry_data;
 
 namespace pages::utils {
 
@@ -41,6 +42,9 @@ class text_drawers {
 
     // Appends the buf data to the filepath, clearing the buf on success.
     void data_download_button(const std::vector<std::string>& raw_lines, std::string& buf);
+
+    // Writes the current data set to a CSV file, clearing the buf on success.
+    void data_csv_download_button(const telemetry_data& data, std::string& buf);
 
   private:
     std::shared_ptr<app_context> context_;

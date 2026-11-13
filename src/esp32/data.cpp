@@ -1,5 +1,6 @@
 #include "esp32/data.hpp"
 
+#include <algorithm>
 #include <charconv>
 #include <exception>
 #include <filesystem>
@@ -10,6 +11,7 @@
 #include <utility>
 #include <vector>
 
+#include <fmt/format.h>
 #include <stdx/profiler.hh>
 #include <stdx/types.hh>
 
@@ -17,6 +19,24 @@
 #include "core/time.hpp"
 
 namespace mbr {
+
+namespace {
+
+void append_csv_field(std::string& out, std::string_view field) {
+    if (field.find_first_of(",\"\n\r") == std::string_view::npos) {
+        out.append(field);
+        return;
+    }
+
+    out.push_back('"');
+    for (const char c : field) {
+        if (c == '"') { out.push_back('"'); }
+        out.push_back(c);
+    }
+    out.push_back('"');
+}
+
+} // namespace
 
 telemetry_data::telemetry_data(const std::filesystem::path& json_path, log_fn_t log)
     : log_{std::move(log)} {
@@ -64,6 +84,72 @@ void telemetry_data::write_data(const std::string& identifier, const std::string
             time_.emplace_back(local_time{raw_micros}.minutes_since_midnight());
         }
     } catch (const std::exception& e) { log_error(log_, "Couldn't write to existing data vector"); }
+}
+
+std::string telemetry_data::to_csv() const {
+    std::string csv;
+
+    for (usize col = 0; col < data_values.size(); ++col) {
+        if (col != 0) { csv.push_back(','); }
+        append_csv_field(csv, data_values[col].key);
+    }
+    csv.push_back('\n');
+
+    // Prefer the raw packet lines: they preserve which fields were actually present in each
+    // packet, so missing samples become empty cells instead of shifting later columns.
+    if (!raw_lines_.empty()) {
+        std::vector<std::string_view> row(data_values.size());
+        for (const auto& raw : raw_lines_) {
+            std::ranges::fill(row, std::string_view{});
+            const std::string_view line{raw};
+
+            usize pos = 0;
+            while (pos < line.size()) {
+                while (pos < line.size() && line[pos] == ' ') { ++pos; }
+                const usize key_begin = pos;
+                while (pos < line.size() && line[pos] != ' ') { ++pos; }
+                if (key_begin == pos) { break; }
+                const std::string_view key = line.substr(key_begin, pos - key_begin);
+
+                while (pos < line.size() && line[pos] == ' ') { ++pos; }
+                const usize value_begin = pos;
+                while (pos < line.size() && line[pos] != ' ') { ++pos; }
+                if (value_begin == pos) { break; }
+                const std::string_view value = line.substr(value_begin, pos - value_begin);
+
+                for (usize col = 0; col < data_values.size(); ++col) {
+                    if (std::string_view{data_values[col].key} == key) {
+                        row[col] = value;
+                        break;
+                    }
+                }
+            }
+
+            for (usize col = 0; col < row.size(); ++col) {
+                if (col != 0) { csv.push_back(','); }
+                append_csv_field(csv, row[col]);
+            }
+            csv.push_back('\n');
+        }
+        return csv;
+    }
+
+    // No raw lines (e.g. data loaded from a text file): fall back to index alignment.
+    usize rows = time_.size();
+    for (const auto& entry : series) { rows = std::max(rows, entry.second.size()); }
+
+    for (usize row = 0; row < rows; ++row) {
+        for (usize col = 0; col < data_values.size(); ++col) {
+            if (col != 0) { csv.push_back(','); }
+            const auto it = series.find(data_values[col].key);
+            if (it != series.end() && row < it->second.size()) {
+                csv.append(fmt::format("{}", it->second[row]));
+            }
+        }
+        csv.push_back('\n');
+    }
+
+    return csv;
 }
 
 void telemetry_data::clear() {

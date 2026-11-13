@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
 #include <gsl/span>
 
@@ -20,7 +19,7 @@ class shock_page : public page {
     void on_exit() override;
     void update() override;
 
-    void draw_lhs(const std::vector<std::string>& raw_lines);
+    void draw_lhs(const telemetry_data& data);
     void draw_rhs(gsl::span<const double> time,
                   gsl::span<const double> fr,
                   gsl::span<const double> fl,

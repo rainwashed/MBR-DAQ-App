@@ -2,7 +2,6 @@
 
 #include <shared_mutex>
 #include <string>
-#include <vector>
 
 #include <fmt/format.h>
 #include <gsl/span>
@@ -30,7 +29,7 @@ void shock_page::update() {
         const auto&            data = context_->backend->get_data();
 
         ImGui::TableNextColumn();
-        draw_lhs(data.get_raw_lines());
+        draw_lhs(data);
         ImGui::TableNextColumn();
         draw_rhs(data.get_time(),
                  data.get_series("FR"),
@@ -40,7 +39,8 @@ void shock_page::update() {
     }
 }
 
-void shock_page::draw_lhs(const std::vector<std::string>& raw_lines) {
+void shock_page::draw_lhs(const telemetry_data& data) {
+    const auto& raw_lines = data.get_raw_lines();
     if (ImGui::BeginChild("##datalog")) {
         const auto cleanup_data{gsl::finally(ImGui::EndChild)};
         BOLD_HEADER(ImGui::Text("Data Log"));
@@ -49,6 +49,8 @@ void shock_page::draw_lhs(const std::vector<std::string>& raw_lines) {
         text_utils_.start_logging_button();
         ImGui::SameLine();
         text_utils_.data_download_button(raw_lines, download_fd_text_);
+        ImGui::SameLine();
+        text_utils_.data_csv_download_button(data, download_fd_text_);
         ImGui::SameLine();
 
         HEADER(utils::draw_input_box("##extra_shock", download_fd_text_, "File descriptor"));
@@ -71,6 +73,7 @@ void shock_page::draw_rhs(gsl::span<const f64> time,
 
         if (ImPlot::BeginPlot(plot_title.c_str(), {-1, -1})) {
             const auto cleanup_plot{gsl::finally(ImPlot::EndPlot)};
+            ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_AutoFit, ImPlotAxisFlags_AutoFit);
             utils::plot_if_non_empty<f64>("Front Right Shock Travel", time, fr);
             utils::plot_if_non_empty<f64>("Front Left Shock Travel", time, fl);
             utils::plot_if_non_empty<f64>("Rear Right Shock Travel", time, br);

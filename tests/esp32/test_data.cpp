@@ -47,6 +47,31 @@ TEST_CASE("telemetry_data config loading and data writing") {
         CHECK(series_e[0] == Catch::Approx(3500.5));
     }
 
+    SECTION("CSV export aligns fields per packet") {
+        data.write_data("T", "60000000");
+        data.write_data("E", "3500.5");
+        data.write_data("W", "1200");
+        data.write_raw_line("T 60000000 E 3500.5 W 1200");
+
+        data.write_data("T", "60100000");
+        data.write_data("E", "3510");
+        data.write_raw_line("T 60100000 E 3510"); // W missing from this packet
+
+        const std::string expected = "T,E,W\n"
+                                     "60000000,3500.5,1200\n"
+                                     "60100000,3510,\n";
+        CHECK(data.to_csv() == expected);
+    }
+
+    SECTION("CSV export falls back to series alignment without raw lines") {
+        data.write_data("T", "60000000");
+        data.write_data("E", "3500.5");
+
+        const std::string expected = "T,E,W\n"
+                                     "60000000,3500.5,\n";
+        CHECK(data.to_csv() == expected);
+    }
+
     SECTION("Handling missing keys") {
         const auto& series_missing = data.get_series("UNKNOWN_KEY");
         CHECK(series_missing.empty());

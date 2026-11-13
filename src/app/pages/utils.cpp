@@ -85,6 +85,26 @@ void text_drawers::data_download_button(const std::vector<std::string>& raw_line
     });
 }
 
+void text_drawers::data_csv_download_button(const telemetry_data& data, std::string& buf) {
+    HEADER({
+        if (ImGui::Button("Download CSV")) {
+            const date_time dt;
+            const auto      filepath =
+                buf.empty()
+                         ? fmt::format("{}.csv", dt.to_string(date_time::fmt_t::TEXT_FILE))
+                         : fmt::format("{}_{}.csv", dt.to_string(date_time::fmt_t::TEXT_FILE), buf);
+
+            std::ofstream out{filepath};
+            if (!out.is_open()) {
+                log_error(context_->log, "Failed to open output file: {}", std::strerror(errno));
+            } else {
+                out << data.to_csv();
+                buf = {};
+            }
+        }
+    });
+}
+
 bool draw_input_box(const char*               label,
                     std::string&              buf,
                     stdx::option<const char*> hint,

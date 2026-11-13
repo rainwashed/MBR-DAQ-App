@@ -2,7 +2,6 @@
 
 #include <shared_mutex>
 #include <string>
-#include <vector>
 
 #include <fmt/format.h>
 #include <gsl/span>
@@ -31,13 +30,14 @@ void rpm_page::update() {
         const auto&            data = context_->backend->get_data();
 
         ImGui::TableNextColumn();
-        DrawLHS(data.get_raw_lines());
+        DrawLHS(data);
         ImGui::TableNextColumn();
         DrawRHS(data.get_time(), data.get_series("W"), data.get_series("E"));
     }
 }
 
-void rpm_page::DrawLHS(const std::vector<std::string>& raw_lines) {
+void rpm_page::DrawLHS(const telemetry_data& data) {
+    const auto& raw_lines = data.get_raw_lines();
     if (ImGui::BeginChild("##datalog")) {
         const auto cleanup_data{gsl::finally(ImGui::EndChild)};
         BOLD_HEADER(ImGui::Text("Data Log"));
@@ -46,6 +46,8 @@ void rpm_page::DrawLHS(const std::vector<std::string>& raw_lines) {
         text_drawer_.start_logging_button();
         ImGui::SameLine();
         text_drawer_.data_download_button(raw_lines, download_fd_text_);
+        ImGui::SameLine();
+        text_drawer_.data_csv_download_button(data, download_fd_text_);
         ImGui::SameLine();
 
         HEADER(utils::draw_input_box("##extra_rpm", download_fd_text_, "File descriptor"));
@@ -66,6 +68,7 @@ void rpm_page::DrawRHS(gsl::span<const f64> time,
 
         if (ImPlot::BeginPlot(plot_title.c_str(), {-1, -1})) {
             const auto cleanup_plot{gsl::finally(ImPlot::EndPlot)};
+            ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_AutoFit, ImPlotAxisFlags_AutoFit);
             utils::plot_if_non_empty<f64>("Wheel Speed", time, wheel);
             utils::plot_if_non_empty<f64>("Engine Speed", time, engine);
         }
