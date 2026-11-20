@@ -363,6 +363,13 @@ void view_page::draw_rhs() {
                                               data_show_ == data_view_t::DYNODATA,
                                           plot_percent_);
 
+            utils::plot_if_non_empty<f64>("Dyno Velocity",
+                                          data.get_time(),
+                                          data.get_series("DV"),
+                                          data_show_ == data_view_t::ALL ||
+                                              data_show_ == data_view_t::DYNODATA,
+                                          plot_percent_);
+
             utils::plot_if_non_empty<f64>("Front Right Shock Travel",
                                           data.get_time(),
                                           data.get_series("FR"),
@@ -719,6 +726,7 @@ void view_page::delete_extra(usize erase_pos) {
         &context_->backend->get_data().get_series("BL"),
         &context_->backend->get_data().get_series("DF"),
         &context_->backend->get_data().get_series("DD"),
+        &context_->backend->get_data().get_series("DV"),
     };
 
     for (const auto& datum : data) {

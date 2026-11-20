@@ -23,7 +23,8 @@ class dyno_page : public page {
     void DrawLHS(const telemetry_data& data);
     void DrawRHS(gsl::span<const double> time,
                  gsl::span<const double> force,
-                 gsl::span<const double> displacement);
+                 gsl::span<const double> displacement,
+                 gsl::span<const double> velocity);
 
   private:
     utils::text_drawers text_drawer_;

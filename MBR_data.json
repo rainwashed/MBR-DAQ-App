@@ -54,7 +54,7 @@
       "name": "Dyno Force",
       "required": false,
       "plot": true,
-      "unit": "g",
+      "unit": "N",
       "group": "dyno"
     },
     {
@@ -62,7 +62,7 @@
       "name": "Dyno Displacement",
       "required": false,
       "plot": true,
-      "unit": "mm",
+      "unit": "in",
       "group": "dyno"
     },
     {
@@ -70,7 +70,7 @@
       "name": "Dyno Velocity",
       "required": false,
       "plot": true,
-      "unit": "mm/s",
+      "unit": "in/s",
       "group": "dyno"
     }
   ]

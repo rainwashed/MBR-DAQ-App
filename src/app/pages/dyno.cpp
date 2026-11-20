@@ -32,7 +32,8 @@ void dyno_page::update() {
         ImGui::TableNextColumn();
         DrawLHS(data);
         ImGui::TableNextColumn();
-        DrawRHS(data.get_time(), data.get_series("DF"), data.get_series("DD"));
+        DrawRHS(
+            data.get_time(), data.get_series("DF"), data.get_series("DD"), data.get_series("DV"));
     }
 }
 
@@ -58,26 +59,41 @@ void dyno_page::DrawLHS(const telemetry_data& data) {
 
 void dyno_page::DrawRHS(gsl::span<const f64> time,
                         gsl::span<const f64> force,
-                        gsl::span<const f64> displacement) {
+                        gsl::span<const f64> displacement,
+                        gsl::span<const f64> velocity) {
     if (ImGui::BeginChild("##graph")) {
-        const auto cleanup_graph{gsl::finally(ImGui::EndChild)};
-        const auto sync_lt    = context_->backend->get_data().get_sync_lt();
-        const auto plot_title = sync_lt
-                                    ? fmt::format("Dyno Data from {}", sync_lt.value().to_string())
-                                    : "No Synced Time";
+        const auto  cleanup_graph{gsl::finally(ImGui::EndChild)};
+        const auto& data       = context_->backend->get_data();
+        const auto  sync_lt    = data.get_sync_lt();
+        const auto  plot_title = sync_lt
+                                     ? fmt::format("Dyno Data from {}", sync_lt.value().to_string())
+                                     : "No Synced Time";
+
+        const auto force_label        = utils::series_label(data, "DF");
+        const auto displacement_label = utils::series_label(data, "DD");
+        const auto velocity_label     = utils::series_label(data, "DV");
 
         if (ImPlot::BeginPlot(plot_title.c_str(), {-1, -1})) {
             const auto cleanup_plot{gsl::finally(ImPlot::EndPlot)};
-            ImPlot::SetupAxes(
-                "Time (min)", "Force (g)", ImPlotAxisFlags_AutoFit, ImPlotAxisFlags_AutoFit);
-            ImPlot::SetupAxis(
-                ImAxis_Y2, "Displacement (cm)", ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_Opposite);
+            ImPlot::SetupAxes("Time (mins)",
+                              force_label.c_str(),
+                              ImPlotAxisFlags_AutoFit,
+                              ImPlotAxisFlags_AutoFit);
+            ImPlot::SetupAxis(ImAxis_Y2,
+                              displacement_label.c_str(),
+                              ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_Opposite);
+            ImPlot::SetupAxis(ImAxis_Y3,
+                              velocity_label.c_str(),
+                              ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_Opposite);
 
             ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
-            utils::plot_if_non_empty<f64>("Dyno Force", time, force);
+            utils::plot_if_non_empty<f64>(force_label.c_str(), time, force);
 
             ImPlot::SetAxes(ImAxis_X1, ImAxis_Y2);
-            utils::plot_if_non_empty<f64>("Dyno Displacement", time, displacement);
+            utils::plot_if_non_empty<f64>(displacement_label.c_str(), time, displacement);
+
+            ImPlot::SetAxes(ImAxis_X1, ImAxis_Y3);
+            utils::plot_if_non_empty<f64>(velocity_label.c_str(), time, velocity);
         }
     }
 }

@@ -4,6 +4,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <gsl/span>
@@ -56,6 +57,10 @@ bool draw_input_box(const char*               label,
                     float                     width_scale = 200.0F,
                     ImGuiInputTextFlags       flags       = 0);
 void draw_data_log(gsl::span<const std::string> raw_lines);
+
+// Builds a display label for a configured series, e.g. "Dyno Force (N)". Falls back to the
+// key itself when it is not present in the telemetry configuration.
+[[nodiscard]] std::string series_label(const telemetry_data& data, std::string_view key);
 
 } // namespace pages::utils
 

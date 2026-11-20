@@ -120,4 +120,14 @@ void draw_data_log(gsl::span<const std::string> raw_lines) {
     if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) { ImGui::SetScrollHereY(1.0F); }
 }
 
+std::string series_label(const telemetry_data& data, std::string_view key) {
+    for (const auto& info : data.data_values) {
+        if (std::string_view{info.key} == key) {
+            if (info.unit.empty()) { return info.name; }
+            return fmt::format("{} ({})", info.name, info.unit);
+        }
+    }
+    return std::string{key};
+}
+
 } // namespace mbr::pages::utils
